@@ -1,17 +1,22 @@
-﻿namespace UrlShortenerWithoutOrleans;
+﻿using System.Collections.Concurrent;
 
-public static class StateManager
+namespace UrlShortenerWithoutOrleans;
+
+public class StateManager : IStateManager
 {
-    private static readonly HashSet<UrlState> _state = [];
+    private readonly ConcurrentBag<UrlState> _state = [];
 
-    public static void SetUrl(string segment, string url)
+    public void SetUrl(string segment, string url) => _state.Add(new UrlState
     {
-        _state.Add(new UrlState
-        {
-            FullUrl = url,
-            Segment = segment,
-        });
-    }
+        FullUrl = url,
+        Segment = segment,
+    });
 
-    public static string? GetUrl(string segment) => _state.FirstOrDefault(state => state.Segment?.Equals(segment) == true)?.FullUrl;
+    public string? GetUrl(string segment) => _state.FirstOrDefault(state => state.Segment?.Equals(segment) == true)?.FullUrl;
+}
+
+public interface IStateManager
+{
+    string? GetUrl(string segment);
+    void SetUrl(string segment, string url);
 }
